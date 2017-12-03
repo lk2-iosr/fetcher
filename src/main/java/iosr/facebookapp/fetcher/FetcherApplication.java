@@ -11,5 +11,6 @@ public class FetcherApplication extends Application<FetcherConfiguration>{
 
     @Override
     public void run(final FetcherConfiguration configuration, final Environment environment) throws Exception {
+        configuration.runScheduledFetcher(environment);
     }
 }
