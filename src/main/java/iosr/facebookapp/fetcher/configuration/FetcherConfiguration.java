@@ -18,17 +18,17 @@ import javax.ws.rs.client.WebTarget;
 import com.google.common.base.Splitter;
 
 public class FetcherConfiguration extends Configuration {
-    private final Map<String, String> env;
+    private final EnvVars envVars;
 
     public FetcherConfiguration() {
-        this.env = System.getenv();
+        this.envVars = new EnvVars();
     }
 
     public void runScheduledFetcher(final Environment environment) {
         final Map<String, String> pages = createPagesMap();
         final ScheduledFetcher scheduledPostsFetcher = new ScheduledFetcher(getFacebookClient(environment),
                 pages,
-                Integer.parseInt(this.env.get("FETCHER_INTERVAL_IN_MINUTES")));
+                Integer.parseInt(this.envVars.getOptional("FETCHER_INTERVAL_IN_MINUTES").orElse("5")));
         environment.lifecycle().manage(scheduledPostsFetcher);
     }
 
@@ -36,18 +36,18 @@ public class FetcherConfiguration extends Configuration {
         return Splitter.on(',')
                 .trimResults()
                 .withKeyValueSeparator(':')
-                .split(this.env.get("PAGES"));
+                .split(this.envVars.getRequired("PAGES"));
     }
 
     private Facebook getFacebookClient(final Environment environment) {
         final WebTarget facebook = getFacebookWebTarget(environment);
-        final int postLimit = 25;
-        final String facebookOAuthKey = this.env.get("FACEBOOK_OAUTH_KEY");
+        final int postLimit = Integer.parseInt(this.envVars.getOptional("POSTS_LIMIT").orElse("50"));
+        final String facebookOAuthKey = this.envVars.getRequired("FACEBOOK_OAUTH_KEY");
         return new Facebook(facebook, checkPostLimit(postLimit), facebookOAuthKey);
     }
 
     private WebTarget getFacebookWebTarget(final Environment environment) {
-        final URI facebookURI = URI.create(this.env.get("FACEBOOK_URI"));
+        final URI facebookURI = URI.create(this.envVars.getRequired("FACEBOOK_URI"));
         final Client jerseyClient = getJerseyClient(environment);
         return jerseyClient.target(facebookURI);
     }
@@ -63,7 +63,6 @@ public class FetcherConfiguration extends Configuration {
     }
 
     private static int checkPostLimit(final int postLimit) {
-        return postLimit <= 100 && postLimit > 0 ? postLimit : 25;
+        return postLimit <= 100 && postLimit > 0 ? postLimit : 100;
     }
-
 }
