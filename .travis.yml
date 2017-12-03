@@ -1,4 +1,6 @@
 sudo: false
+services:
+  - docker
 language: java
 branches:
   only:
