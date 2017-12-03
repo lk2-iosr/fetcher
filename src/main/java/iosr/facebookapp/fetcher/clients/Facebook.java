@@ -1,5 +1,7 @@
 package iosr.facebookapp.fetcher.clients;
 
+import iosr.facebookapp.fetcher.model.Post;
+
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -8,7 +10,13 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 public class Facebook {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(Facebook.class.getName());
     private final WebTarget facebook;
     private final int postLimit;
@@ -22,7 +30,7 @@ public class Facebook {
         this.facebookOAuthKey = facebookOAuthKey;
     }
 
-    public void fetchPagePosts(final String id, final String title) {
+    public void fetchPagePosts(final String id) {
         Response response = null;
         try {
             response = this.facebook.path(id).path("posts")
@@ -36,10 +44,19 @@ public class Facebook {
         catch(Exception e) {
             LOGGER.error("Problem with obtaining response: {}", e.getMessage());
         }
-        processResponse(response, title);
+        processResponse(response);
     }
 
-    private void processResponse(final Response response, final String pageTitle) {
-
+    private void processResponse(final Response response) {
+        final ArrayNode data = (ArrayNode) response.readEntity(JsonNode.class).get("data");
+        data.forEach(p -> {
+            try {
+                final Post post = OBJECT_MAPPER.treeToValue(p, Post.class);
+                LOGGER.info(post.asJson());
+            }
+            catch(JsonProcessingException e) {
+                LOGGER.error("Problem with parsing post: {}", e.getMessage());
+            }
+        });
     }
 }

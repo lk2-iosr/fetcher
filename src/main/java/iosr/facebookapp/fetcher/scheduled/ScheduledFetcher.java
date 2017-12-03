@@ -28,7 +28,7 @@ public class ScheduledFetcher extends AbstractScheduledService implements Manage
     @Override
     protected void runOneIteration() throws Exception {
         this.pages.forEach((key, value) -> {
-            this.facebook.fetchPagePosts(key, value);
+            this.facebook.fetchPagePosts(key);
             LOGGER.info("Post fetched for page: {}", value);
         });
     }
