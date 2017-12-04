@@ -21,11 +21,17 @@ This will build `jar` file and create docker image ``iosr.facebookapp/fetcher``
 
 ### Environment variables
 
-* `FACEBOOK_URI` (required) - URI of Facebook GraphAPI (https://graph.facebook.com/v2.10/)
-* `FACEBOOK_OAUTH_KEY` (required) - Facebook Access Token
-* `PAGES` (required) - comma separated list of `<page id>:<page title>` pairs
-* `FETCHER_INTERVAL_IN_MINUTES` (optional) - default value is 5
-* `POSTS_LIMIT` (optional) - default value is 50, max value is 100 because of Facebook limits
+**1. REQUIRED**
+* `FACEBOOK_URI` - URI of Facebook GraphAPI (https://graph.facebook.com/v2.10/)
+* `FACEBOOK_OAUTH_KEY` - Facebook Access Token
+* `PAGES`  - comma separated list of `<page id>:<page title>` pairs
+* `AWS_ACCESS_KEY` 
+* `AWS_SECRET_KEY`
+* `FETCHED_POSTS_TOPIC` - ARN of SNS where fetched posts should be published
+
+**2. OPTIONAL**
+* `FETCHER_INTERVAL_IN_MINUTES` - default value is 5
+* `POSTS_LIMIT` - default value is 50, max value is 100 because of Facebook limits
 
 ## How it works
 In given interval application fetches the latest `N` posts from specified pages and for each of them produces message in format:
@@ -41,4 +47,4 @@ In given interval application fetches the latest `N` posts from specified pages 
 }
 ```
 
-These messages will be published to Amazon SNS or SQS and then consumed by [stats](https://github.com/lk2-iosr/stats) and [publisher](https://github.com/lk2-iosr/publisher)
+These messages will be published to Amazon SNS and then consumed by [stats](https://github.com/lk2-iosr/stats) and [publisher](https://github.com/lk2-iosr/publisher)
