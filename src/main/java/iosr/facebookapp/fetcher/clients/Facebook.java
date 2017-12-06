@@ -1,5 +1,6 @@
 package iosr.facebookapp.fetcher.clients;
 
+import iosr.facebookapp.fetcher.aws.Topic;
 import iosr.facebookapp.fetcher.model.Post;
 
 import javax.ws.rs.client.WebTarget;
@@ -21,13 +22,15 @@ public class Facebook {
     private final WebTarget facebook;
     private final int postLimit;
     private final String facebookOAuthKey;
+    private final Topic topic;
 
     public Facebook(final WebTarget facebook,
                     final int postLimit,
-                    final String facebookOAuthKey) {
+                    final String facebookOAuthKey, final Topic topic) {
         this.facebook = facebook;
         this.postLimit = postLimit;
         this.facebookOAuthKey = facebookOAuthKey;
+        this.topic = topic;
     }
 
     public void fetchPagePosts(final String id) {
@@ -52,7 +55,7 @@ public class Facebook {
         data.forEach(p -> {
             try {
                 final Post post = OBJECT_MAPPER.treeToValue(p, Post.class);
-                LOGGER.info(post.asJson());
+                this.topic.publish(post);
             }
             catch(JsonProcessingException e) {
                 LOGGER.error("Problem with parsing post: {}", e.getMessage());
