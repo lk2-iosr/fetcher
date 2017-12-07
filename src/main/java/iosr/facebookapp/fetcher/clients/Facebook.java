@@ -52,7 +52,11 @@ public class Facebook {
 
     private void processResponse(final Response response) {
         final ArrayNode data = (ArrayNode) response.readEntity(JsonNode.class).get("data");
-        data.forEach(p -> {
+        data.forEach(this::publishPost);
+    }
+
+    private void publishPost(final JsonNode p) {
+        if(p.has("message") && p.has("link")) {
             try {
                 final Post post = OBJECT_MAPPER.treeToValue(p, Post.class);
                 this.topic.publish(post);
@@ -60,6 +64,6 @@ public class Facebook {
             catch(JsonProcessingException e) {
                 LOGGER.error("Problem with parsing post: {}", e.getMessage());
             }
-        });
+        }
     }
 }
