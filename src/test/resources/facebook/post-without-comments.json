@@ -1,0 +1,28 @@
+{
+  "id": "123_456",
+  "message": "No comments!",
+  "link": "http://test.com",
+  "shares": {
+    "count": 3
+  },
+  "likes": {
+    "data": [
+      {
+        "id": "user_id1",
+        "name": "Marvin"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "Mzg5OTU4OTc0NzYyMzY1",
+        "after": "Mzg5OTU4OTc0NzYyMzY1"
+      }
+    },
+    "summary": {
+      "total_count": 1,
+      "can_like": false,
+      "has_liked": false
+    }
+  },
+  "created_time": "2017-12-07T13:44:00+0000"
+}
