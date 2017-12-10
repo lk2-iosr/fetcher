@@ -37,13 +37,13 @@ public class Post {
     @JsonProperty("createdTime")
     private final String createdTime;
 
-    Post(final String id,
-         final String message,
-         final String link,
-         final int shares,
-         final int likes,
-         final int comments,
-         final String createdTime) {
+    public Post(final String id,
+                final String message,
+                final String link,
+                final int shares,
+                final int likes,
+                final int comments,
+                final String createdTime) {
         this.id = id;
         this.message = message;
         this.link = link;

@@ -34,7 +34,7 @@ public class Facebook {
     }
 
     public void fetchPagePosts(final String id) {
-        Response response = null;
+        Response response;
         try {
             response = this.facebook.path(id).path("posts")
                     .queryParam("limit", this.postLimit)
@@ -46,6 +46,7 @@ public class Facebook {
         }
         catch(Exception e) {
             LOGGER.error("Problem with obtaining response: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
         processResponse(response);
     }
