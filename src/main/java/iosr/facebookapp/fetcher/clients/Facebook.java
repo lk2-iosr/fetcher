@@ -34,7 +34,7 @@ public class Facebook {
     }
 
     public void fetchPagePosts(final String id) {
-        Response response = null;
+        Response response;
         try {
             response = this.facebook.path(id).path("posts")
                     .queryParam("limit", this.postLimit)
@@ -46,13 +46,18 @@ public class Facebook {
         }
         catch(Exception e) {
             LOGGER.error("Problem with obtaining response: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
         processResponse(response);
     }
 
     private void processResponse(final Response response) {
         final ArrayNode data = (ArrayNode) response.readEntity(JsonNode.class).get("data");
-        data.forEach(p -> {
+        data.forEach(this::publishPost);
+    }
+
+    private void publishPost(final JsonNode p) {
+        if(p.has("message") && p.has("link")) {
             try {
                 final Post post = OBJECT_MAPPER.treeToValue(p, Post.class);
                 this.topic.publish(post);
@@ -60,6 +65,6 @@ public class Facebook {
             catch(JsonProcessingException e) {
                 LOGGER.error("Problem with parsing post: {}", e.getMessage());
             }
-        });
+        }
     }
 }

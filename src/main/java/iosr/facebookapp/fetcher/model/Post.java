@@ -1,9 +1,10 @@
 package iosr.facebookapp.fetcher.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Objects.requireNonNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -11,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.MoreObjects;
 
 public class Post {
     private static final Logger LOGGER = LoggerFactory.getLogger(Post.class.getName());
@@ -34,16 +35,15 @@ public class Post {
     @JsonProperty("comments")
     private final int comments;
     @JsonProperty("createdTime")
-    @JsonInclude(NON_NULL)
     private final String createdTime;
 
-    private Post(final String id,
-                 final String message,
-                 final String link,
-                 final int shares,
-                 final int likes,
-                 final int comments,
-                 final String createdTime) {
+    public Post(final String id,
+                final String message,
+                final String link,
+                final int shares,
+                final int likes,
+                final int comments,
+                final String createdTime) {
         this.id = id;
         this.message = message;
         this.link = link;
@@ -61,7 +61,13 @@ public class Post {
                 @JsonProperty("likes") @Nullable final JsonNode likes,
                 @JsonProperty("comments") @Nullable final JsonNode comments,
                 @JsonProperty("created_time") final String createdTime) {
-        this(id, message, link, getSharesCount(shares), getCount(likes), getCount(comments), convertCreatedTime(createdTime));
+        this(id,
+                requireNonNull(message),
+                requireNonNull(link),
+                getSharesCount(shares),
+                getCount(likes),
+                getCount(comments),
+                convertCreatedTime(createdTime));
     }
 
     private static String convertCreatedTime(final String createdTime) {
@@ -97,6 +103,39 @@ public class Post {
             LOGGER.error("Problem with writing post as json: {}", e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if(o instanceof Post) {
+            final Post post = (Post) o;
+            return shares == post.shares &&
+                    likes == post.likes &&
+                    comments == post.comments &&
+                    Objects.equals(id, post.id) &&
+                    Objects.equals(message, post.message) &&
+                    Objects.equals(link, post.link) &&
+                    Objects.equals(createdTime, post.createdTime);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, message, link, shares, likes, comments, createdTime);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("message", message)
+                .add("link", link)
+                .add("shares", shares)
+                .add("likes", likes)
+                .add("comments", comments)
+                .add("createdTime", createdTime)
+                .toString();
     }
 }
 
