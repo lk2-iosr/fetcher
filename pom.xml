@@ -19,6 +19,7 @@
         <junit.version>4.12</junit.version>
         <assertj.version>3.8.0</assertj.version>
         <mockito-core.version>2.13.0</mockito-core.version>
+        <docker.image.prefix>lk2iosr</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -128,7 +129,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>${project.groupId}/${project.artifactId}</repository>
+                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
                 </configuration>
             </plugin>
         </plugins>

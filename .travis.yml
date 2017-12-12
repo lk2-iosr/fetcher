@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 services:
   - docker
 language: java
@@ -9,6 +9,9 @@ jdk:
   - oraclejdk8
 script:
   - mvn verify
+  - mvn dockerfile:push
+before_install:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 install: echo "We believe in Maven."
 cache:
   directories:
