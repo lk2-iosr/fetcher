@@ -3,12 +3,15 @@ package iosr.facebookapp.fetcher.scheduled;
 import io.dropwizard.lifecycle.Managed;
 import iosr.facebookapp.fetcher.clients.Facebook;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AbstractScheduledService;
 
 public class ScheduledFetcher extends AbstractScheduledService implements Managed {
@@ -29,7 +32,17 @@ public class ScheduledFetcher extends AbstractScheduledService implements Manage
     protected void runOneIteration() throws Exception {
         this.pages.forEach((key, value) -> {
             this.facebook.fetchPagePosts(key);
-            LOGGER.info("Post fetched for page: {}", value);
+            Map<String, Object> map = new HashMap<>();
+            map.put("eventType","Bla");
+            final String s;
+            try {
+                s = new ObjectMapper().writeValueAsString(map);
+            }
+            catch(JsonProcessingException e) {
+                e.printStackTrace();
+                return;
+            }
+            LOGGER.info(s);
         });
     }
 

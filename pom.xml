@@ -130,7 +130,7 @@
                 </executions>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
-                    <tag>v1</tag>
+                    <tag>v2</tag>
                 </configuration>
             </plugin>
         </plugins>
