@@ -21,10 +21,10 @@ public class Topic {
 
     public void publish(final Post post) {
         final PublishRequest publishRequest = new PublishRequest(this.arn, post.asJson());
-        try{
+        try {
             this.sns.publish(publishRequest);
         }
-        catch (final AmazonClientException e) {
+        catch(final AmazonClientException e) {
             LOGGER.error("Publishing to Amazon SNS failed!");
             throw new RuntimeException(e);
         }

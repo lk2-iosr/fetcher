@@ -3,19 +3,12 @@ package iosr.facebookapp.fetcher.scheduled;
 import io.dropwizard.lifecycle.Managed;
 import iosr.facebookapp.fetcher.clients.Facebook;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.AbstractScheduledService;
 
 public class ScheduledFetcher extends AbstractScheduledService implements Managed {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledFetcher.class.getName());
     private final Facebook facebook;
     private final Map<String, String> pages;
     private final int intervalInMinutes;
@@ -29,21 +22,8 @@ public class ScheduledFetcher extends AbstractScheduledService implements Manage
     }
 
     @Override
-    protected void runOneIteration() throws Exception {
-        this.pages.forEach((key, value) -> {
-            this.facebook.fetchPagePosts(key);
-            Map<String, Object> map = new HashMap<>();
-            map.put("eventType","Bla");
-            final String s;
-            try {
-                s = new ObjectMapper().writeValueAsString(map);
-            }
-            catch(JsonProcessingException e) {
-                e.printStackTrace();
-                return;
-            }
-            LOGGER.info(s);
-        });
+    protected void runOneIteration() {
+        this.pages.forEach(this.facebook::fetchPagePosts);
     }
 
     @Override
@@ -52,12 +32,12 @@ public class ScheduledFetcher extends AbstractScheduledService implements Manage
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         this.startAsync().awaitRunning();
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         this.stopAsync().awaitTerminated();
     }
 }
