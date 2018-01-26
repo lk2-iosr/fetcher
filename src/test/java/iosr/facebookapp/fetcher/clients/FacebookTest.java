@@ -46,7 +46,7 @@ public class FacebookTest {
     private Facebook facebook;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockWebTarget();
         this.facebook = new Facebook(this.target, 5, "oauth key", this.topic);
     }
@@ -61,12 +61,12 @@ public class FacebookTest {
     }
 
     @Test
-    public void shouldPublishAllPosts() throws Exception {
+    public void shouldPublishAllPosts() {
         prepareResponse(ImmutableList.of("post.json",
                 "post-without-shares.json",
                 "post-without-likes.json",
                 "post-without-comments.json"));
-        this.facebook.fetchPagePosts("pageId");
+        this.facebook.fetchPagePosts("pageId", "pageTitle");
         verify(this.topic).publish(new Post(ID, "Something happened!", LINK, SHARES, LIKES, COMMENTS, CREATED_TIME));
         verify(this.topic).publish(new Post(ID, "No shares!", LINK, 0, LIKES, COMMENTS, CREATED_TIME));
         verify(this.topic).publish(new Post(ID, "No likes!", LINK, SHARES, 0, COMMENTS, CREATED_TIME));
@@ -74,24 +74,26 @@ public class FacebookTest {
     }
 
     @Test
-    public void shouldNotPublishAnyPost() throws Exception {
+    public void shouldNotPublishAnyPost() {
         prepareResponse(ImmutableList.of("post-without-message.json", "post-without-link.json"));
-        this.facebook.fetchPagePosts("pageId");
+        this.facebook.fetchPagePosts("pageId", "pageTitle");
         verifyZeroInteractions(this.topic);
     }
 
     @Test
-    public void shouldNotPublishPostWithoutLink() throws Exception {
+    public void shouldNotPublishPostWithoutLink() {
         prepareResponse(ImmutableList.of("post.json", "post-without-link.json"));
-        this.facebook.fetchPagePosts("pageId");
+        this.facebook.fetchPagePosts("pageId", "pageTitle");
         verify(this.topic).publish(new Post(ID, "Something happened!", LINK, SHARES, LIKES, COMMENTS, CREATED_TIME));
         verifyNoMoreInteractions(this.topic);
     }
 
-    private void prepareResponse(final List<String> resourcesName) throws Exception {
+    private void prepareResponse(final List<String> resourcesName) {
         final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
         final List<JsonNode> nodes = resourcesName.stream().map(FacebookTest::createNode).collect(Collectors.toList());
         final ArrayNode arrayNode = jsonNodeFactory.arrayNode().addAll(nodes);
+        when(this.response.getStatus()).thenReturn(200);
+        when(this.response.getStatusInfo()).thenReturn(Response.Status.OK);
         when(this.response.readEntity(JsonNode.class)).thenReturn(jsonNodeFactory.objectNode().set("data", arrayNode));
     }
 

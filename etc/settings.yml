@@ -9,4 +9,4 @@ logging:
       threshold: ALL
       timeZone: UTC
       target: stdout
-      logFormat: '{"time": "%d{HH:mm:ss.SSS}", "message": %msg}%n'
+      logFormat: '{"source": "%logger", "level": "%level", "message": %msg}%n'
